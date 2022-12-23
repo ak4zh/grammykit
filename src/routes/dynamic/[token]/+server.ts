@@ -3,6 +3,10 @@ import * as env from '$env/static/private';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { Bot, webhookCallback } from 'grammy';
 
+const BOT_COMMANDS = {
+    start: 'Welcome to grammykit !',
+    help: 'This is help info'
+}
 
 const buildBot = async (token: string) => {
     const bot = new Bot(token)
@@ -15,19 +19,15 @@ const buildBot = async (token: string) => {
         await next();
     })
 
-    privateChats.command('start', async (ctx, next) => {
-        await ctx.reply('Welcome to grammykit !', {
-            reply_to_message_id: ctx.msg?.message_id
-        });
-        await next();
-    })
+    for (const [command, msg] of Object.entries(BOT_COMMANDS)) {
+        privateChats.command(command, async (ctx, next) => {
+            await ctx.reply(msg, {
+                reply_to_message_id: ctx.msg?.message_id
+            });
+            await next();
+        })    
+    }
 
-    privateChats.command('help', async (ctx, next) => {
-        await ctx.reply('Help info !', {
-            reply_to_message_id: ctx.msg?.message_id
-        });
-        await next();
-    })
     return bot
 }
 
@@ -37,7 +37,7 @@ export const POST: RequestHandler = async (event) => {
 }
 
 export const GET: RequestHandler = async ({ url, params }) => {
-    const webhookUrl = dev ? `${env.HTTPS_LOCALHOST}/${params.token}` : `${url.origin}/${params.token}`
+    const baseURL = dev ? env.HTTPS_LOCALHOST : url.origin
     const bot = new Bot(params.token)
-    return json(await bot.api.setWebhook(webhookUrl))
+    return json(await bot.api.setWebhook(`${baseURL}${url.pathname}`))
 }

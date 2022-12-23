@@ -33,6 +33,6 @@ export const GET: RequestHandler = async ({ url, params }) => {
     if (params.token !== env.BOT_TOKEN) {
         throw error(401, 'Unauthorized')
     };
-    const webhookUrl = dev ? `${env.HTTPS_LOCALHOST}/${env.BOT_TOKEN}` : `${url.origin}/${env.BOT_TOKEN}`
-    return json(await bot.api.setWebhook(webhookUrl))
+    const baseURL = dev ? env.HTTPS_LOCALHOST : url.origin
+    return json(await bot.api.setWebhook(`${baseURL}${url.pathname}`))
 }
