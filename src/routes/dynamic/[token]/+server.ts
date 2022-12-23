@@ -25,10 +25,16 @@ const buildBot = async (token: string) => {
             reply_to_message_id: ctx.msg?.message_id
         });
         // so something else
-        await ctx.reply('Not as reply');
-        if (ctx.senderChat?.id) {
-            await ctx.forwardMessage(ctx.senderChat?.id)
-        }
+        await ctx.reply('Not as reply 1');
+        await ctx.reply('Not as reply 2');
+        await ctx.reply('Not as reply 3');
+        await ctx.reply('Not as reply 4');
+        await ctx.reply('Not as reply 5');
+        await ctx.reply('Not as reply 6');
+        await ctx.reply('Not as reply 7');
+        await ctx.reply('Not as reply 8');
+        await ctx.reply('Not as reply 9');
+        await ctx.reply('Not as reply 10');
         await next();
     })    
 
