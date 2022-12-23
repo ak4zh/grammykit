@@ -1,6 +1,6 @@
 import { dev } from '$app/environment';
 import * as env from '$env/static/private';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json, type RequestHandler, error } from '@sveltejs/kit';
 import { Bot, webhookCallback } from 'grammy';
 
 const bot = new Bot(env.BOT_TOKEN)
@@ -31,7 +31,10 @@ bot.filter(() => true, (ctx) => console.log(ctx.msg?.message_id))
 
 export const POST: RequestHandler = webhookCallback(bot, 'sveltekit')
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, params }) => {
+    if (params.token !== env.BOT_TOKEN) {
+        throw error(401, 'Unauthorized')
+    };
     const webhookUrl = dev ? `${env.HTTPS_LOCALHOST}/${env.BOT_TOKEN}` : `${url.origin}/${env.BOT_TOKEN}`
     return json(await bot.api.setWebhook(webhookUrl))
 }
