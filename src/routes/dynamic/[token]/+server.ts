@@ -5,11 +5,6 @@ import { Bot, webhookCallback } from 'grammy';
 import { apiThrottler } from "@grammyjs/transformer-throttler";
 import { autoRetry } from "@grammyjs/auto-retry";
 
-const BOT_COMMANDS = {
-    start: 'Welcome to grammykit !',
-    help: 'This is help info'
-}
-
 const buildBot = async (token: string) => {
     const bot = new Bot(token)
     const throttler = apiThrottler();
@@ -25,17 +20,17 @@ const buildBot = async (token: string) => {
         await next();
     })
 
-    for (const [command, msg] of Object.entries(BOT_COMMANDS)) {
-        privateChats.command(command, async (ctx, next) => {
-            await ctx.reply(msg, {
-                reply_to_message_id: ctx.msg?.message_id
-            });
-            // so something else
-            await ctx.reply(msg);
+    privateChats.command('start', async (ctx, next) => {
+        await ctx.reply('Welcome to grammykit !', {
+            reply_to_message_id: ctx.msg?.message_id
+        });
+        // so something else
+        await ctx.reply('Not as reply');
+        if (ctx.senderChat?.id) {
             await ctx.forwardMessage(ctx.senderChat?.id)
-            await next();
-        })    
-    }
+        }
+        await next();
+    })    
 
     return bot
 }
