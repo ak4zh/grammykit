@@ -2,6 +2,8 @@ import { dev } from '$app/environment';
 import * as env from '$env/static/private';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { Bot, webhookCallback } from 'grammy';
+import { apiThrottler } from "@grammyjs/transformer-throttler";
+import { autoRetry } from "@grammyjs/auto-retry";
 
 const BOT_COMMANDS = {
     start: 'Welcome to grammykit !',
@@ -10,6 +12,10 @@ const BOT_COMMANDS = {
 
 const buildBot = async (token: string) => {
     const bot = new Bot(token)
+    const throttler = apiThrottler();
+    bot.api.config.use(throttler);
+    bot.api.config.use(autoRetry());
+
     const privateChats = bot.chatType('private')
     privateChats.on('message:entities:bot_command', async (ctx, next) => {
         await ctx.reply(`You sent bot command: ${ctx.msg.text}`, {
