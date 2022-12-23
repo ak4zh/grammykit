@@ -4,8 +4,8 @@ import { json, type RequestHandler, error } from '@sveltejs/kit';
 import { Bot, webhookCallback } from 'grammy';
 
 const bot = new Bot(env.BOT_TOKEN)
-
-bot.on('message:entities:bot_command', async (ctx, next) => {
+const privateChats = bot.chatType('private')
+privateChats.on('message:entities:bot_command', async (ctx, next) => {
     await ctx.reply(`You sent bot command: ${ctx.msg.text}`, {
         reply_to_message_id: ctx.msg?.message_id
     });
@@ -13,21 +13,19 @@ bot.on('message:entities:bot_command', async (ctx, next) => {
     await next();
 })
 
-bot.command('start', async (ctx, next) => {
+privateChats.command('start', async (ctx, next) => {
     await ctx.reply('Welcome to grammykit !', {
         reply_to_message_id: ctx.msg?.message_id
     });
     await next();
 })
 
-bot.command('help', async (ctx, next) => {
+privateChats.command('help', async (ctx, next) => {
     await ctx.reply('Help info !', {
         reply_to_message_id: ctx.msg?.message_id
     });
     await next();
 })
-
-bot.filter(() => true, (ctx) => console.log(ctx.msg?.message_id))
 
 export const POST: RequestHandler = webhookCallback(bot, 'sveltekit')
 
