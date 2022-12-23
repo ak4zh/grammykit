@@ -24,6 +24,9 @@ const buildBot = async (token: string) => {
             await ctx.reply(msg, {
                 reply_to_message_id: ctx.msg?.message_id
             });
+            // so something else
+            await ctx.reply(msg);
+            await ctx.forwardMessage(ctx.senderChat?.id)
             await next();
         })    
     }
